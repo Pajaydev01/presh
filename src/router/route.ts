@@ -26,6 +26,8 @@ router.post("/finance/checkout",authservice.authenticate,financeController.creat
 router.patch("/finance/checkout",authservice.authenticate,financeController.confirmCheckout);
 router.get("/finance/bulkCheck",authservice.authenticate,financeController.MultiResolve);
 
+router.post("/transaction/create",authservice.authenticate,transactionController.create);
+router.get("/transaction/get",authservice.authenticate,transactionController.getAllTransactions);
 
 
 //special check service
@@ -37,8 +39,6 @@ router.post("/special/checkface",authservice.authenticate,specialController.doFa
 //////use auth middleware here /////////
 router.get("/me",authservice.authorize,userController.getUser);
 router.patch("/me",authservice.authorize,userController.updateUser);
-router.post("/transaction/create",authservice.authorize,transactionController.create);
-router.get("/transaction/get",authservice.authorize,transactionController.getAllTransactions);
 
 
 

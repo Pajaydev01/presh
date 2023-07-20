@@ -161,6 +161,8 @@ class fincanceController extends fincanceRequest{
         responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error');   
         }
     }
+    
+    
 }
 
 export default new fincanceController();

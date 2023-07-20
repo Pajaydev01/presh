@@ -5,9 +5,9 @@ dotenv.config()
 export const config={
     ENVIRONMENT:process.env.ENVIRONMENT,
     SECRET:process.env.SECRET,
-    HOST:process.env.HOST,
-    USERNAME:process.env.USERNAME,
-    PASSWORD:process.env.PASSWORD,
+    HOST:process.env.DB_HOST,
+    USERNAME:process.env.DB_USERNAME,
+    PASSWORD:process.env.DB_PASSWORD,
     DATABASE:process.env.DB,
     EMAIL_HOST:process.env.EMAIL_HOST,
     EMAIL_USER:process.env.EMAIL_USER,
