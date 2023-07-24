@@ -27,7 +27,6 @@ exports.config = {
     FINCRA_CHANNEL: process.env.FINCRA_CHANNEL,
     FINCRA_PUBLIC_KEY_TEST: process.env.FINCRA_PUBLIC_KEY_TEST,
     FINCRA_PUBLIC_KEY_LIVE: process.env.FINCRA_PUBLIC_KEY_LIVE,
-    FINCRA_BUSINESS: process.env.FINCRA_BUSINESS,
-    DB_PORT: process.env.DB_PORT
+    FINCRA_BUSINESS: process.env.FINCRA_BUSINESS
 };
 //# sourceMappingURL=config.js.map

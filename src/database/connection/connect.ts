@@ -4,6 +4,7 @@ import { config } from "../../config/config.js";
 declare var require: (arg0: string) => { (): any; new(): any; };
 const db=require('mysql-promise')();
 class connect{
+    connect:any=null;
     constructor(){
         //connect to db
     }
@@ -17,12 +18,13 @@ class connect{
             database:config.DATABASE,
 
         });
+        this.connect=con;
         return db;
     }
 
 loadConnection=()=>{
         //this.creatConnection();
-        return this.creatConnection()
+        return this.connect==null?this.creatConnection():this.connect;
     }
 
 }

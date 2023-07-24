@@ -11,7 +11,6 @@ class initiate {
         this.run = () => {
             let parent = this;
             const con = connect_js_1.default.loadConnection();
-            // console.log(con)
             //add all tables here to create them
             const query = [
                 con.query("CREATE TABLE users(id int(11) NOT NULL AUTO_INCREMENT,email varchar(50) UNIQUE NOT NULL,phone varchar(50) UNIQUE NOT NULL,firstname text NOT NULL, lastname text NOT NULL,password varchar(60),created_at timestamp, PRIMARY KEY (id)) ENGINE=InnoDB"),
@@ -32,9 +31,10 @@ class initiate {
                 con.query("CREATE TABLE `apiUsers`(id int(11) NOT NULL AUTO_INCREMENT,username TEXT NOT NULL,token varchar(1000) NULL,created_at timestamp,updated_at timestamp NULL, PRIMARY KEY (id)) ENGINE=InnoDB")
             ];
             return new Promise((resolve, reject) => {
+                //  console.log(query)
                 //Promise.
                 Promise.allSettled(query).then((res) => {
-                    //console.log(res)
+                    // console.log(res)
                     resolve(res);
                 }).catch((err) => {
                     //console.log(err)

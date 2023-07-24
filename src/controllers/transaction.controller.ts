@@ -35,7 +35,18 @@ class transaction extends transactionReq{
     public getAllTransactions=async (req:Request,res:Response,next:NextFunction)=>{
         try {
             await this.getTransactionCheck(req,res);
-            const body=req.body;
+            let body;
+            if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
+                if(req.query.constructor === Object && Object.keys(req.query).length === 0){
+    body={}
+                }
+                else{
+                    body=req.query
+                }
+              }
+              else{
+                body=req.body;
+              }
             //const user=authservice.getUser(req,res);
 
             //get the user transaction

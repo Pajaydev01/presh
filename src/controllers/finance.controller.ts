@@ -45,8 +45,20 @@ class fincanceController extends fincanceRequest{
         try {
             await this.accountCheck(req,res);
             //run
-            const get:Array<any>=await helper.select('wallet',[],[{user_id:req.body.user_id}]);
-            responseService.respond(res,{...get[0]},200,true,'Account retrieved successfuly')
+            let body;
+            if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
+                if(req.query.constructor === Object && Object.keys(req.query).length === 0){
+    body={}
+                }
+                else{
+                    body=req.query
+                }
+              }
+              else{
+                body=req.body;
+              }
+            const get:Array<any>=await helper.select('wallet',[],[{user_id:body.user_id}]);
+            get.length==0?responseService.respond(res,{},200,false,'Account not found'):responseService.respond(res,{...get[0]},200,true,'Account retrieved successfuly')
         } catch (error) {
             responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error');  
         }

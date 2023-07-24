@@ -28,13 +28,13 @@ router.get("/finance/create", authservice_js_1.default.authenticate, finance_con
 router.post("/finance/checkout", authservice_js_1.default.authenticate, finance_controller_js_1.default.createCheckout);
 router.patch("/finance/checkout", authservice_js_1.default.authenticate, finance_controller_js_1.default.confirmCheckout);
 router.get("/finance/bulkCheck", authservice_js_1.default.authenticate, finance_controller_js_1.default.MultiResolve);
+router.post("/transaction/create", authservice_js_1.default.authenticate, transaction_controller_js_1.default.create);
+router.get("/transaction/get", authservice_js_1.default.authenticate, transaction_controller_js_1.default.getAllTransactions);
 //special check service
 router.post("/special/checkface", authservice_js_1.default.authenticate, special_controller_js_1.default.doFaceCheck);
 //////use auth middleware here /////////
 router.get("/me", authservice_js_1.default.authorize, user_controller_js_1.default.getUser);
 router.patch("/me", authservice_js_1.default.authorize, user_controller_js_1.default.updateUser);
-router.post("/transaction/create", authservice_js_1.default.authorize, transaction_controller_js_1.default.create);
-router.get("/transaction/get", authservice_js_1.default.authorize, transaction_controller_js_1.default.getAllTransactions);
 ///////create api user
 router.post("/users/create", user_controller_js_1.default.makeUser);
 //# sourceMappingURL=route.js.map

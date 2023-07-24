@@ -6,7 +6,8 @@ import fetch from 'node-fetch';
 import * as fs from 'fs';
 import * as mime from 'mime-db';
 import * as canvas from 'canvas';
-import * as faceapi from 'face-api.js';
+import * as faceapi from 'face-api.js'; 
+//import '@tensorflow/tfjs-node';
 class action{
     async hasher(password:string): Promise<any>{
         return new Promise(async(resolve,reject)=>{
@@ -137,6 +138,7 @@ reject(err)
   public detectFace=async (file:string):Promise<any>=> {
     return new Promise(async(resolve,reject)=>{
     try { 
+
         //turn the base 64 into a fil
         const { Canvas, Image, ImageData } :any= canvas
         faceapi.env.monkeyPatch({ Canvas, Image, ImageData });

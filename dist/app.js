@@ -27,5 +27,5 @@ app.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);
 });
 //fire db
-connect_js_1.default.creatConnection();
+connect_js_1.default.creatConnection;
 //# sourceMappingURL=app.js.map
