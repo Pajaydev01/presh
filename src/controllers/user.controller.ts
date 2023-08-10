@@ -51,6 +51,7 @@ class users extends userRequests{
            const path='src/uploads/';
            const port = req.hostname;
            const url=`${req.protocol}://${req.hostname}:${config.PORT}`;
+          // console.log(body)
            //work on multiple uploads here
            if(body.multiple){
             //collect the array, and save, no need to delete

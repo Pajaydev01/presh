@@ -11,19 +11,20 @@ class connect{
 
     creatConnection=()=>{
        // const db=require('mysql-promise')();
-        const con=db.configure({
+        db.configure({
             host:config.HOST,
             user:config.USERNAME,
             password:config.PASSWORD,
             database:config.DATABASE,
 
         });
-        this.connect=con;
+        this.connect=db;
         return db;
     }
 
 loadConnection=()=>{
         //this.creatConnection();
+     //   console.log(this.connect)
         return this.connect==null?this.creatConnection():this.connect;
     }
 

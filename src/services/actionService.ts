@@ -6,7 +6,10 @@ import fetch from 'node-fetch';
 import * as fs from 'fs';
 import * as mime from 'mime-db';
 import * as canvas from 'canvas';
-import * as faceapi from 'face-api.js'; 
+import * as faceapi from 'face-api.js';
+import cluster from 'node:cluster';
+import * as  os from 'os';
+import http from 'node:http'; 
 //import '@tensorflow/tfjs-node';
 class action{
     async hasher(password:string): Promise<any>{
@@ -161,6 +164,10 @@ reject(err)
     return [...Array(30)]
     .map((e) => ((Math.random() * 36) | 0).toString(36))
     .join('');
+  }
+
+  public restartService=():void=>{
+        cluster.emit('exit',{});
   }
 }
 

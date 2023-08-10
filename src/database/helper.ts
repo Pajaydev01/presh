@@ -62,8 +62,10 @@ class helper{
             const query:any=!where?con.query(`SELECT ${col} FROM ${table} ${order!=''?'ORDER BY '+order+' '+direction:''}`):con.query(`SELECT ${col} FROM ${table} ${'WHERE '+this.filter(where,whereType)} ${order!=''?'ORDER BY '+order+' '+direction:''}`);
             query.spread((res:any)=>{
                 // con.end();
+                //console.log(res)
                 resolve(res)
             }).catch(err=>{
+                console.log(err)
                 con.end();
                 reject (err)
             })

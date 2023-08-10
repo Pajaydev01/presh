@@ -15,7 +15,7 @@ class transaction extends transactionReq{
             // save the transaction, if it is debit, reduce balance in savings, if it is credit, add to balance
             //balance is sufficient
             const balance:Array<any>=await helper.select('wallet',['balance'],[{user_id:body.user_id}],"AND");
-           if(balance.length==0)return responseService.respond(res,{},412,false,'User has no waller');
+           if(balance.length==0)return responseService.respond(res,{},412,false,'User has no wallet');
             if(parseInt(balance[0].balance)<parseInt(body.amount) && body.type=='debit')return responseService.respond(res,{},412,false,'Insufficient balance');
             //save transaction and update balance
             body['user_id']=body.user_id;
@@ -51,7 +51,7 @@ class transaction extends transactionReq{
 
             //get the user transaction
             const where=body.id?[{id:body.id, user_id:body.user_id}]:[{user_id:body.user_id}];
-            const transactions=await helper.select('transactions',[],where,'AND');
+            const transactions=await helper.select('transactions',[],where,'AND','id','DESC');
             const message=transactions.length==0?'No transaction found':'Transaction request successful';
             responseService.respond(res,transactions,201,true,message);
         } catch (error) {

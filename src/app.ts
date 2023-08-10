@@ -49,4 +49,4 @@ if(cluster.isPrimary){
 }
 
 //fire db
-connect.creatConnection();
+connect.loadConnection();
