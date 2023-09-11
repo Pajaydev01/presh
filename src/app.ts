@@ -8,6 +8,8 @@ const port = config.PORT || 1000;
 import cluster from 'node:cluster';
 import * as  os from 'os';
 import http from 'node:http';
+import path from 'node:path';
+import websocketService from './services/websocket.service.js';
 app.use(express.json({limit:'5000mb'}));
 app.use(express.urlencoded({limit: '5000mb'}));
 app.use(express.json());
@@ -23,6 +25,9 @@ app.get('/', (req, res) => {
 
 
 app.use('/api',router);
+
+//for images and static files
+app.use("/src/uploads/", express.static(path.resolve(__dirname,'../src/uploads/')));
 
 //use the processes
 if(cluster.isPrimary){
@@ -43,6 +48,8 @@ if(cluster.isPrimary){
   })
 }else{
   const apper=http.createServer(app);
+  //fire socket
+  websocketService.connect(apper);
   apper.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);
   });

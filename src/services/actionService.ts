@@ -10,6 +10,7 @@ import * as faceapi from 'face-api.js';
 import cluster from 'node:cluster';
 import * as  os from 'os';
 import http from 'node:http'; 
+import path from 'node:path';
 //import '@tensorflow/tfjs-node';
 class action{
     async hasher(password:string): Promise<any>{
@@ -82,17 +83,20 @@ class action{
 
     public async uploadImage(path:string,user:string, file:string, reduce:boolean=false):Promise<string>{
         const decodeBase64Image=(dataString:string):Promise<any>=> {
+           // console.log('file: ', dataString)
             return new Promise((resolve,reject)=>{
-                var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+               // var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+                //var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,/),
+                const matches=dataString.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/),
                 response :any= {};
-            
-              if (matches.length !== 3) {
+          // console.log('match: ',dataString.replace(/^data:([A-Za-z-+/]+);base64,/, ''))
+              if (!matches.length) {
                 reject (new Error('Invalid input string'))
               }
             
               response.type = matches[1];
-              response.data = new Buffer(matches[2], 'base64');
-            
+              response.data = new Buffer(dataString.replace(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/, ''), 'base64');
+            //console.log(response)
               resolve(response);
             })
           }
@@ -104,13 +108,14 @@ class action{
   var type = decodedImg.type;
   var extension = mime[type];
   //console.log(extension)
-  const date=new Date().getTime();
+  const date=new Date().getTime()+this.genToken();
   var fileName =  date+user+"upload." + extension.extensions[0];
 
     const write=fs.writeFileSync(path + fileName, imageBuffer, 'utf8');
     resolve(fileName);
  }
 catch(err){
+    //console.log(err)
 reject(err)
 }
         })
@@ -122,6 +127,51 @@ reject(err)
 
             fs.unlinkSync(path+name)
             resolve('done');
+        })
+    }
+
+    //optimized for case of missing images in server
+    public async deleteMultipleFile(file:Array<string>):Promise<string>{
+        return new Promise<string>(async (resolve, reject) => {
+            const deleted=[];
+            try {
+                
+                file.forEach((res:any,index:number)=>{
+                    //for errors and missing files, write a sequence to ignore
+                    //get the path and name
+                    // const pather=path.resolve(__dirname,`../${res.split('src/')[1]}`);
+                    const pather=`src/${res.split('src/')[1]}`;
+                   // console.log('here the path: ',pather)
+                    fs.unlinkSync(pather)
+                    deleted.push(res)
+                })
+                resolve('done'); 
+            } catch (error) {
+                //remove the errored file and repush
+                let deler:Array<any>;
+                const rem=file.filter(res=>`src/${res.split('src/')[1]}`!=error.path);
+                //if there are some deleted, remove them from the sent file and continue deleting
+                if(deleted.length>0){
+                deler=rem.filter(res=>{
+                    return !deleted.includes(res);
+                })
+                }
+                else{
+                    deler=rem
+                }
+                
+                if(deler.length==0){
+                // console.log(deler)
+                    //resolve('done')
+                }
+                else{
+                    //console.log('errored',deleted);
+                    
+                    await this.deleteMultipleFile(rem)
+                }
+               
+               resolve(error) 
+            }
         })
     }
 

@@ -13,6 +13,7 @@ class transactionReq extends mainHelper{
                 'type',
                 'description',
                 'user_id',
+                'charges',
                 't_id'
             ];
             const check:any=this.run(req,required);

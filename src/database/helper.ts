@@ -40,11 +40,11 @@ class helper{
         })
     }
 
-    public update=(table:string,data:objects,where:where)=>{
+    public update=(table:string,data:objects,where:where=null,whereType:string='AND' || 'OR')=>{
         return new Promise((resolve:any,reject:any)=>{
             const con=connect.loadConnection();
             let query;
-            query=[con.query(`UPDATE ${table} SET ? WHERE ?`,[data,where])];
+            query=[con.query(`UPDATE ${table} SET ? ${'WHERE '+this.filter2(where,whereType)}`,[data])];
             Promise.all(query).then((res:any)=>{
                 //con.end()
                 resolve(res)
@@ -85,6 +85,21 @@ class helper{
                 }
             }
         }
+        const res=query.toString().split(',').join(` ${type} `);
+        return res
+
+    }
+
+    private filter2=(item,type)=>{
+        let query=[];
+            const element = item;
+            for (const key in element) {
+                if (Object.prototype.hasOwnProperty.call(element, key)) {
+                    const resp = element[key];
+                    const itemer=key+" = "+"'"+resp+"'";
+                    query.push(itemer)
+                }
+            }
         const res=query.toString().split(',').join(` ${type} `);
         return res
 

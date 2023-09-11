@@ -30,6 +30,8 @@ router.patch("/finance/checkout", authservice_js_1.default.authenticate, finance
 router.get("/finance/bulkCheck", authservice_js_1.default.authenticate, finance_controller_js_1.default.MultiResolve);
 router.post("/transaction/create", authservice_js_1.default.authenticate, transaction_controller_js_1.default.create);
 router.get("/transaction/get", authservice_js_1.default.authenticate, transaction_controller_js_1.default.getAllTransactions);
+//delete file 
+router.delete("/user/uploadFile", authservice_js_1.default.authenticate, user_controller_js_1.default.delFiles);
 //special check service
 router.post("/special/checkface", authservice_js_1.default.authenticate, special_controller_js_1.default.doFaceCheck);
 //////use auth middleware here /////////

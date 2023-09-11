@@ -14,6 +14,7 @@ class transactionReq extends main_1.default {
                     'type',
                     'description',
                     'user_id',
+                    'charges',
                     't_id'
                 ];
                 const check = this.run(req, required);

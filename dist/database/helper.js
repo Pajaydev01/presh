@@ -8,7 +8,7 @@ class helper {
     constructor() {
         this.insert = (table, data) => {
             return new Promise((resolve, reject) => {
-                const con = connect_js_1.default.creatConnection();
+                const con = connect_js_1.default.loadConnection();
                 con.query(`INSERT INTO ${table} SET ?`, data).then((resp) => {
                     //  con.end();
                     resolve(resp);
@@ -20,7 +20,7 @@ class helper {
         };
         this.insertMultiple = (table, data) => {
             return new Promise((resolve, reject) => {
-                const con = connect_js_1.default.creatConnection();
+                const con = connect_js_1.default.loadConnection();
                 const queries = [];
                 data.forEach(async (resp) => {
                     queries.push(con.query(`INSERT INTO ${table} SET ?`, resp));
@@ -37,7 +37,7 @@ class helper {
         };
         this.update = (table, data, where) => {
             return new Promise((resolve, reject) => {
-                const con = connect_js_1.default.creatConnection();
+                const con = connect_js_1.default.loadConnection();
                 let query;
                 query = [con.query(`UPDATE ${table} SET ? WHERE ?`, [data, where])];
                 Promise.all(query).then((res) => {
@@ -51,13 +51,15 @@ class helper {
         };
         this.select = (table, column, where = null, whereType = 'AND' || 'OR', order = '', direction = '') => {
             return new Promise((resolve, reject) => {
-                const con = connect_js_1.default.creatConnection();
+                const con = connect_js_1.default.loadConnection();
                 const col = column.length == 0 ? '*' : column;
                 const query = !where ? con.query(`SELECT ${col} FROM ${table} ${order != '' ? 'ORDER BY ' + order + ' ' + direction : ''}`) : con.query(`SELECT ${col} FROM ${table} ${'WHERE ' + this.filter(where, whereType)} ${order != '' ? 'ORDER BY ' + order + ' ' + direction : ''}`);
                 query.spread((res) => {
                     // con.end();
+                    //console.log(res)
                     resolve(res);
                 }).catch(err => {
+                    console.log(err);
                     con.end();
                     reject(err);
                 });

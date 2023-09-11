@@ -5,9 +5,21 @@ class mainHelper {
         this.run = (req, required) => {
             //check if the request has the array
             //to make things less complex, collect the keys in the request to another array
+            let payload;
+            if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+                if (req.query.constructor === Object && Object.keys(req.query).length === 0) {
+                    payload = {};
+                }
+                else {
+                    payload = req.query;
+                }
+            }
+            else {
+                payload = req.body;
+            }
             const arr = [];
-            for (const key in req.body) {
-                if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+            for (const key in payload) {
+                if (Object.prototype.hasOwnProperty.call(payload, key)) {
                     arr.push(key);
                 }
             }

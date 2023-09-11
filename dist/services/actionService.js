@@ -34,6 +34,8 @@ const fs = __importStar(require("fs"));
 const mime = __importStar(require("mime-db"));
 const canvas = __importStar(require("canvas"));
 const faceapi = __importStar(require("face-api.js"));
+const node_cluster_1 = __importDefault(require("node:cluster"));
+//import '@tensorflow/tfjs-node';
 class action {
     constructor() {
         this.loop = async (file, user, path, url) => {
@@ -72,6 +74,9 @@ class action {
             return [...Array(30)]
                 .map((e) => ((Math.random() * 36) | 0).toString(36))
                 .join('');
+        };
+        this.restartService = () => {
+            node_cluster_1.default.emit('exit', {});
         };
     }
     async hasher(password) {
@@ -134,13 +139,18 @@ class action {
     }
     async uploadImage(path, user, file, reduce = false) {
         const decodeBase64Image = (dataString) => {
+            // console.log('file: ', dataString)
             return new Promise((resolve, reject) => {
-                var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/), response = {};
-                if (matches.length !== 3) {
+                // var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+                //var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,/),
+                const matches = dataString.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/), response = {};
+                // console.log('match: ',dataString.replace(/^data:([A-Za-z-+/]+);base64,/, ''))
+                if (!matches.length) {
                     reject(new Error('Invalid input string'));
                 }
                 response.type = matches[1];
-                response.data = new Buffer(matches[2], 'base64');
+                response.data = new Buffer(dataString.replace(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/, ''), 'base64');
+                //console.log(response)
                 resolve(response);
             });
         };
@@ -152,12 +162,13 @@ class action {
                 var type = decodedImg.type;
                 var extension = mime[type];
                 //console.log(extension)
-                const date = new Date().getTime();
+                const date = new Date().getTime() + this.genToken();
                 var fileName = date + user + "upload." + extension.extensions[0];
                 const write = fs.writeFileSync(path + fileName, imageBuffer, 'utf8');
                 resolve(fileName);
             }
             catch (err) {
+                //console.log(err)
                 reject(err);
             }
         });
@@ -166,6 +177,47 @@ class action {
         return new Promise((resolve, reject) => {
             fs.unlinkSync(path + name);
             resolve('done');
+        });
+    }
+    //optimized for case of missing images in server
+    async deleteMultipleFile(file) {
+        return new Promise(async (resolve, reject) => {
+            const deleted = [];
+            try {
+                file.forEach((res, index) => {
+                    //for errors and missing files, write a sequence to ignore
+                    //get the path and name
+                    // const pather=path.resolve(__dirname,`../${res.split('src/')[1]}`);
+                    const pather = `src/${res.split('src/')[1]}`;
+                    // console.log('here the path: ',pather)
+                    fs.unlinkSync(pather);
+                    deleted.push(res);
+                });
+                resolve('done');
+            }
+            catch (error) {
+                //remove the errored file and repush
+                let deler;
+                const rem = file.filter(res => `src/${res.split('src/')[1]}` != error.path);
+                //if there are some deleted, remove them from the sent file and continue deleting
+                if (deleted.length > 0) {
+                    deler = rem.filter(res => {
+                        return !deleted.includes(res);
+                    });
+                }
+                else {
+                    deler = rem;
+                }
+                if (deler.length == 0) {
+                    // console.log(deler)
+                    //resolve('done')
+                }
+                else {
+                    //console.log('errored',deleted);
+                    await this.deleteMultipleFile(rem);
+                }
+                resolve(error);
+            }
         });
     }
 }

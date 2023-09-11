@@ -43,7 +43,9 @@ constructor(){
                     con.query("ALTER TABLE `wallet` CHANGE `accountNumber` `accountNumber` VARCHAR(5000) NOT NULL"),
                     con.query("ALTER TABLE `wallet` ADD `balance` varchar(1000) NOT NULL"),
                     con.query("CREATE TABLE checkouts(id int(11) NOT NULL AUTO_INCREMENT,user_id varchar(50) NOT NULL,amount int(50) NULL,status BOOLEAN NOT NULL,reference TEXT NULL,created_at timestamp,updated_at timestamp NULL, PRIMARY KEY (id)) ENGINE=InnoDB"),
-                    con.query("CREATE TABLE `apiUsers`(id int(11) NOT NULL AUTO_INCREMENT,username TEXT NOT NULL,token varchar(1000) NULL,created_at timestamp,updated_at timestamp NULL, PRIMARY KEY (id)) ENGINE=InnoDB")
+                    con.query("CREATE TABLE `apiUsers`(id int(11) NOT NULL AUTO_INCREMENT,username TEXT NOT NULL,token varchar(1000) NULL,created_at timestamp,updated_at timestamp NULL, PRIMARY KEY (id)) ENGINE=InnoDB"),
+                    con.query("CREATE TABLE `profit`(id int(11) NOT NULL AUTO_INCREMENT,amount varchar(1000) NOT NULL,description text NOT NULL, t_id varchar(1000) NOT NULL, created_at timestamp,updated_at timestamp NULL, PRIMARY KEY (id)) ENGINE=InnoDB"),
+                    con.query("CREATE TABLE `chats` (id int(11) NOT NULL AUTO_INCREMENT,target VARCHAR(1000) NOT NULL, sender VARCHAR(1000) NOT NULL,messages LONGTEXT NOT NULL,created_at timestamp,updated_at timestamp NULL, PRIMARY KEY (id)) ENGINE=InnoDB")
         ] 
         return new Promise((resolve:any,reject:any)=>{
           //  console.log(query)

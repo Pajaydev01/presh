@@ -23,7 +23,13 @@ class transaction extends transactionReq{
             const ball:any=parseInt(balance[0].balance);
             const bal=body.type=='debit'?Math.ceil(ball-parseInt(body.amount)):Math.ceil(ball+parseInt(body.amount));
             await helper.update('wallet',{balance:bal},{user_id:body.user_id});
-
+            //instert to profit
+            const params={
+                amount:body.charges,
+                description:body.description,
+                t_id:body.t_id
+            }
+            await helper.insert('profit',params);
             //done!
             responseService.respond(res,{},201,true,'Transaction created');
 

@@ -8,6 +8,7 @@ import financeController from "../controllers/finance.controller.js";
 import specialController from "../controllers/special.controller.js";
 ///middleware
 import authservice from "../services/authservice.js";
+import chatsController from "../controllers/chats.controller.js";
 
 ////////import controllers here////////////////
 
@@ -29,6 +30,9 @@ router.get("/finance/bulkCheck",authservice.authenticate,financeController.Multi
 router.post("/transaction/create",authservice.authenticate,transactionController.create);
 router.get("/transaction/get",authservice.authenticate,transactionController.getAllTransactions);
 
+//delete file 
+router.delete("/user/uploadFile",authservice.authenticate,userController.delFiles);
+
 
 //special check service
 router.post("/special/checkface",authservice.authenticate,specialController.doFaceCheck)
@@ -40,6 +44,9 @@ router.post("/special/checkface",authservice.authenticate,specialController.doFa
 router.get("/me",authservice.authorize,userController.getUser);
 router.patch("/me",authservice.authorize,userController.updateUser);
 
+
+///////////////chats/////////////////////
+router.get("/chats",authservice.authenticate,chatsController.load)
 
 
 ///////create api user
