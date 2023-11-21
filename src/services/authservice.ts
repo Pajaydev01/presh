@@ -37,7 +37,7 @@ public authenticate=async (req:Request,res:Response,next:NextFunction)=>{
 
 public getUser=(req:Request, res:Response)=>{
     try {
-        let val;
+        let val:any;
         const token:any=req.headers['x-auth-token'];
         jsontoken.verify(token,config.SECRET,(err,value)=>{
             val=value;

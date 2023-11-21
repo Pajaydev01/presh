@@ -10,26 +10,24 @@ class transaction extends transactionReq{
         try {
             await this.transactionCheck(req,res);
             const body=req.body;
+            const user=await authservice.getUser(req,res);
             //const user=authservice.getUser(req,res);
             if(body.type!='credit' && body.type!='debit') return responseService.respond(res,{},412,false,'Invalid type');
             // save the transaction, if it is debit, reduce balance in savings, if it is credit, add to balance
             //balance is sufficient
-            const balance:Array<any>=await helper.select('wallet',['balance'],[{user_id:body.user_id}],"AND");
-           if(balance.length==0)return responseService.respond(res,{},412,false,'User has no wallet');
-            if(parseInt(balance[0].balance)<parseInt(body.amount) && body.type=='debit')return responseService.respond(res,{},412,false,'Insufficient balance');
+            const balance:Array<any>=await helper.select('details',[body.field],[{mail:user.mail}],"AND");
+            if(parseInt(balance[0][body.field])<parseInt(body.amount) && body.type=='debit')return responseService.respond(res,{},412,false,'Insufficient balance');
             //save transaction and update balance
-            body['user_id']=body.user_id;
-            await helper.insert('transactions',body);
-            const ball:any=parseInt(balance[0].balance);
-            const bal=body.type=='debit'?Math.ceil(ball-parseInt(body.amount)):Math.ceil(ball+parseInt(body.amount));
-            await helper.update('wallet',{balance:bal},{user_id:body.user_id});
+            body['mail']=user.mail;
+            const ball:any=balance[0][body.field]=='' || balance[0][body.field]==null?0:parseInt(balance[0][body.field]);
+            const bal=body.type=='debit'?Math.ceil(ball-parseInt(body.total)):Math.ceil(ball+parseInt(body.total));
+            const update={}
+            update[body.field]=bal;
+            await helper.update('details',update,{mail:user.mail});
+            const info=body;
+            delete info['field'];
+            await helper.insert('transaction',info);
             //instert to profit
-            const params={
-                amount:body.charges,
-                description:body.description,
-                t_id:body.t_id
-            }
-            await helper.insert('profit',params);
             //done!
             responseService.respond(res,{},201,true,'Transaction created');
 
@@ -53,13 +51,23 @@ class transaction extends transactionReq{
               else{
                 body=req.body;
               }
-            //const user=authservice.getUser(req,res);
+            const user=authservice.getUser(req,res);
 
             //get the user transaction
-            const where=body.id?[{id:body.id, user_id:body.user_id}]:[{user_id:body.user_id}];
+            const where=body.id?[{sn:body.id, mail:user.mail}]:[{mail:user.mail}];
             const transactions=await helper.select('transactions',[],where,'AND','id','DESC');
             const message=transactions.length==0?'No transaction found':'Transaction request successful';
             responseService.respond(res,transactions,201,true,message);
+        } catch (error) {
+            responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error');
+        }
+    }
+
+    public getDetails=async (req:Request,res:Response,next:NextFunction)=>{
+        try {
+            const user=authservice.getUser(req,res);
+            const info=await helper.select('details',[],[{mail:user.mail}]);
+            responseService.respond(res,info,200,true,'User wallet retrieved')
         } catch (error) {
             responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error');
         }

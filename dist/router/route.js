@@ -15,6 +15,7 @@ const finance_controller_js_1 = __importDefault(require("../controllers/finance.
 const special_controller_js_1 = __importDefault(require("../controllers/special.controller.js"));
 ///middleware
 const authservice_js_1 = __importDefault(require("../services/authservice.js"));
+const chats_controller_js_1 = __importDefault(require("../controllers/chats.controller.js"));
 ////////import controllers here////////////////
 //////define routes here /////////////////////////
 router.post("/register", login_js_1.default.register);
@@ -37,6 +38,8 @@ router.post("/special/checkface", authservice_js_1.default.authenticate, special
 //////use auth middleware here /////////
 router.get("/me", authservice_js_1.default.authorize, user_controller_js_1.default.getUser);
 router.patch("/me", authservice_js_1.default.authorize, user_controller_js_1.default.updateUser);
+///////////////chats/////////////////////
+router.get("/chats", authservice_js_1.default.authenticate, chats_controller_js_1.default.load);
 ///////create api user
 router.post("/users/create", user_controller_js_1.default.makeUser);
 //# sourceMappingURL=route.js.map

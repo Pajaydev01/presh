@@ -52,8 +52,8 @@ class users extends userRequests{
            const body=req.body;
            const path='src/uploads/';
            const port = req.hostname;
-           //const url=`${req.protocol}://${req.hostname}:${config.PORT}`;
-           const url=`http://192.168.137.1:1000`;
+           const url=`${req.protocol}://${req.hostname}:${config.PORT}`;
+          // const url=`http://192.168.137.1:1000`;
           // console.log(body)
            //work on multiple uploads here
            if(body.multiple){
@@ -94,31 +94,6 @@ class users extends userRequests{
            //get the protocol, host and port
           // const item=body.file.replace(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/, '');
            responseService.respond(res,{url:url+'/'+path+process},201,true,'File uploaded');
-        } catch (error) {
-            responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error'); 
-        }
-    }
-
-    public makeUser=async (req:Request,res:Response)=>{
-        try {
-           await this.authCheck(req,res);
-           //check if the user exist
-           const body=req.body;
-           const check=await helper.select('apiUsers',['username'],[{username:body.username}]);
-           if(check.length!=0){
-            //user exists already
-            responseService.respond(res,{},412,false,'User already exists');
-            return;
-           }
-           //create the user
-           const token=actionService.genToken();
-           const response={
-            token:token,
-            username:body.username
-           };
-        //save to db
-        await helper.insert('apiUsers',response);
-        responseService.respond(res,response,201,true,'User created');
         } catch (error) {
             responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error'); 
         }

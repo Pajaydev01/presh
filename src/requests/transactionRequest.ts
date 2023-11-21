@@ -9,12 +9,17 @@ class transactionReq extends mainHelper{
     public transactionCheck=(req:Request,res:Response):Promise<void>=>{
         return new Promise((resolve,reject)=>{
             const required=[
-                'amount',
+                'total',
                 'type',
-                'description',
-                'user_id',
-                'charges',
-                't_id'
+                'note',
+                'ref',
+                'phone',
+                'postCode',
+                'address',
+                'town',
+                'lname',
+                'fname',
+                'field'
             ];
             const check:any=this.run(req,required);
             let res;

@@ -16,7 +16,7 @@ class login extends registerRequest{
             //run check for required
            await this.registerCheck(req,res);
             //check if email or phone exists
-            const checker:any=await helper.select('users',[],[{email:body.email,phone:body.phone}],'OR');
+            const checker:any=await helper.select('users',[],[{mail:body.mail}],'AND');
             if(checker.length>0)return responseService.respond(res,{},412,false,'The selected email or phone number already exists');
             
             //hash password
@@ -26,10 +26,16 @@ class login extends registerRequest{
             body['salt']=hash.salt;
             const saver=await helper.insert('users',body);
             //get the user and insert saving
-            await helper.insert('savings',{user_id:saver[0].insertId,balance:0});
+            await helper.insert('details',{mail:body.mail});
             //create user token
             //return success
-            responseService.respond(res,{},200,true,'Registeration successful');
+            const user:Array<any>=await helper.select('users',[],[{mail:body.mail}],'AND');
+            delete user[0].password;
+            delete user[0].salt;
+            const token=jsontoken.sign({...user[0]},config.SECRET,{
+                expiresIn: 86400 // expires in 24 hours
+              });
+            responseService.respond(res,{},200,true,'Registeration successful',token);
         } catch (error) {
             //console.log(error.code)
           responseService.respond(res,error.data?error.data:error,error.code && typeof error.code=='number'?error.code:500,false,error.message?error.message:'Server error');
@@ -42,7 +48,7 @@ class login extends registerRequest{
          await this.loginCheck(req,res);
             //checker
             
-            const checker:Array<any>=await helper.select('users',[],[{email:body.email}],'AND');
+            const checker:Array<any>=await helper.select('users',[],[{mail:body.email}],'AND');
             if(checker.length==0)return responseService.respond(res,{},404,false,'Invalid email');
 
             //proceed
@@ -57,7 +63,7 @@ class login extends registerRequest{
             const token=jsontoken.sign({...checker[0]},config.SECRET,{
                 expiresIn: 86400 // expires in 24 hours
               });
-            responseService.respond(res,{...checker[0],},200,true,'login successful',token);
+            responseService.respond(res,{...checker[0]},200,true,'login successful',token);
 
         } catch (error) {
             console.log(error)

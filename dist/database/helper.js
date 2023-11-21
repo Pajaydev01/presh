@@ -35,11 +35,11 @@ class helper {
                 });
             });
         };
-        this.update = (table, data, where) => {
+        this.update = (table, data, where = null, whereType = 'AND' || 'OR') => {
             return new Promise((resolve, reject) => {
                 const con = connect_js_1.default.loadConnection();
                 let query;
-                query = [con.query(`UPDATE ${table} SET ? WHERE ?`, [data, where])];
+                query = [con.query(`UPDATE ${table} SET ? ${'WHERE ' + this.filter2(where, whereType)}`, [data])];
                 Promise.all(query).then((res) => {
                     //con.end()
                     resolve(res);
@@ -75,6 +75,19 @@ class helper {
                         const itemer = key + " = " + "'" + resp + "'";
                         query.push(itemer);
                     }
+                }
+            }
+            const res = query.toString().split(',').join(` ${type} `);
+            return res;
+        };
+        this.filter2 = (item, type) => {
+            let query = [];
+            const element = item;
+            for (const key in element) {
+                if (Object.prototype.hasOwnProperty.call(element, key)) {
+                    const resp = element[key];
+                    const itemer = key + " = " + "'" + resp + "'";
+                    query.push(itemer);
                 }
             }
             const res = query.toString().split(',').join(` ${type} `);

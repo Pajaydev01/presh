@@ -6,7 +6,6 @@ import fetch from 'node-fetch';
 import * as fs from 'fs';
 import * as mime from 'mime-db';
 import * as canvas from 'canvas';
-import * as faceapi from 'face-api.js';
 import cluster from 'node:cluster';
 import * as  os from 'os';
 import http from 'node:http'; 
@@ -186,29 +185,6 @@ reject(err)
             resolve(data);
         })
        }
-
-        //detect face
-  public detectFace=async (file:string):Promise<any>=> {
-    return new Promise(async(resolve,reject)=>{
-    try { 
-
-        //turn the base 64 into a fil
-        const { Canvas, Image, ImageData } :any= canvas
-        faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
-        const img:any=new canvas.Image();
-        img.src=file;
-        await faceapi.nets.faceLandmark68Net.loadFromDisk('./public/models');
-        await faceapi.nets.ssdMobilenetv1.loadFromDisk('./public/models');
-        const detect=await faceapi.detectSingleFace(img);
-        //console.log(detect)
-        resolve(detect)
-    }
-    catch (err) {
-        console.log(err)
-      reject (err)
-    } 
-    })
-  }
 
   public genToken=():string=>{
     return [...Array(30)]

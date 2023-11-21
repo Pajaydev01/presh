@@ -9,11 +9,12 @@ class registerRequest extends mainHelper{
     public registerCheck=(req:Request,res:Response):Promise<void>=>{
         return new Promise((resolve,reject)=>{
             const required=[
-                'firstname',
-                'password',
-                'lastname',
-                'email',
-                'phone'
+                'name',
+                'mail',
+                'username',
+                'country',
+                'currency',
+                'password'
             ];
             const check:any=this.run(req,required);
             let res;
