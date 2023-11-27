@@ -13,7 +13,7 @@ class helper {
                     //  con.end();
                     resolve(resp);
                 }).catch((err) => {
-                    con.end();
+                    // con.end();
                     reject(err);
                 });
             });
@@ -30,7 +30,7 @@ class helper {
                     //  con.end();
                     resolve(resp);
                 }).catch((err) => {
-                    con.end();
+                    //con.end();
                     reject(err);
                 });
             });
@@ -44,7 +44,7 @@ class helper {
                     //con.end()
                     resolve(res);
                 }).catch((err) => {
-                    con.end();
+                    // con.end()
                     reject(err);
                 });
             });
@@ -60,7 +60,7 @@ class helper {
                     resolve(res);
                 }).catch(err => {
                     console.log(err);
-                    con.end();
+                    // con.end();
                     reject(err);
                 });
             });

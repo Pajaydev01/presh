@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const response_service_js_1 = __importDefault(require("../services/response.service.js"));
 const helper_js_1 = __importDefault(require("../database/helper.js"));
+const authservice_js_1 = __importDefault(require("../services/authservice.js"));
 const transactionRequest_1 = __importDefault(require("../requests/transactionRequest"));
 class transaction extends transactionRequest_1.default {
     constructor() {
@@ -13,29 +14,26 @@ class transaction extends transactionRequest_1.default {
             try {
                 await this.transactionCheck(req, res);
                 const body = req.body;
+                const user = await authservice_js_1.default.getUser(req, res);
                 //const user=authservice.getUser(req,res);
                 if (body.type != 'credit' && body.type != 'debit')
                     return response_service_js_1.default.respond(res, {}, 412, false, 'Invalid type');
                 // save the transaction, if it is debit, reduce balance in savings, if it is credit, add to balance
                 //balance is sufficient
-                const balance = await helper_js_1.default.select('wallet', ['balance'], [{ user_id: body.user_id }], "AND");
-                if (balance.length == 0)
-                    return response_service_js_1.default.respond(res, {}, 412, false, 'User has no wallet');
-                if (parseInt(balance[0].balance) < parseInt(body.amount) && body.type == 'debit')
+                const balance = await helper_js_1.default.select('details', [body.field], [{ mail: user.mail }], "AND");
+                if (parseInt(balance[0][body.field]) < parseInt(body.amount) && body.type == 'debit')
                     return response_service_js_1.default.respond(res, {}, 412, false, 'Insufficient balance');
                 //save transaction and update balance
-                body['user_id'] = body.user_id;
-                await helper_js_1.default.insert('transactions', body);
-                const ball = parseInt(balance[0].balance);
-                const bal = body.type == 'debit' ? Math.ceil(ball - parseInt(body.amount)) : Math.ceil(ball + parseInt(body.amount));
-                await helper_js_1.default.update('wallet', { balance: bal }, { user_id: body.user_id });
+                body['mail'] = user.mail;
+                const ball = balance[0][body.field] == '' || balance[0][body.field] == null ? 0 : parseInt(balance[0][body.field]);
+                const bal = body.type == 'debit' ? Math.ceil(ball - parseInt(body.total)) : Math.ceil(ball + parseInt(body.total));
+                const update = {};
+                update[body.field] = bal;
+                await helper_js_1.default.update('details', update, { mail: user.mail });
+                const info = body;
+                delete info['field'];
+                await helper_js_1.default.insert('transaction', info);
                 //instert to profit
-                const params = {
-                    amount: body.charges,
-                    description: body.description,
-                    t_id: body.t_id
-                };
-                await helper_js_1.default.insert('profit', params);
                 //done!
                 response_service_js_1.default.respond(res, {}, 201, true, 'Transaction created');
             }
@@ -58,12 +56,22 @@ class transaction extends transactionRequest_1.default {
                 else {
                     body = req.body;
                 }
-                //const user=authservice.getUser(req,res);
+                const user = authservice_js_1.default.getUser(req, res);
                 //get the user transaction
-                const where = body.id ? [{ id: body.id, user_id: body.user_id }] : [{ user_id: body.user_id }];
+                const where = body.id ? [{ sn: body.id, mail: user.mail }] : [{ mail: user.mail }];
                 const transactions = await helper_js_1.default.select('transactions', [], where, 'AND', 'id', 'DESC');
                 const message = transactions.length == 0 ? 'No transaction found' : 'Transaction request successful';
                 response_service_js_1.default.respond(res, transactions, 201, true, message);
+            }
+            catch (error) {
+                response_service_js_1.default.respond(res, error.data ? error.data : error, error.code && typeof error.code == 'number' ? error.code : 500, false, error.message ? error.message : 'Server error');
+            }
+        };
+        this.getDetails = async (req, res, next) => {
+            try {
+                const user = authservice_js_1.default.getUser(req, res);
+                const info = await helper_js_1.default.select('details', [], [{ mail: user.mail }]);
+                response_service_js_1.default.respond(res, info, 200, true, 'User wallet retrieved');
             }
             catch (error) {
                 response_service_js_1.default.respond(res, error.data ? error.data : error, error.code && typeof error.code == 'number' ? error.code : 500, false, error.message ? error.message : 'Server error');

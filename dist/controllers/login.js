@@ -42,7 +42,7 @@ class login extends registerRequest_js_1.default {
                 //run check for required
                 await this.registerCheck(req, res);
                 //check if email or phone exists
-                const checker = await helper_js_1.default.select('users', [], [{ email: body.email, phone: body.phone }], 'OR');
+                const checker = await helper_js_1.default.select('users', [], [{ mail: body.mail }], 'AND');
                 if (checker.length > 0)
                     return response_service_js_1.default.respond(res, {}, 412, false, 'The selected email or phone number already exists');
                 //hash password
@@ -51,10 +51,16 @@ class login extends registerRequest_js_1.default {
                 body['salt'] = hash.salt;
                 const saver = await helper_js_1.default.insert('users', body);
                 //get the user and insert saving
-                await helper_js_1.default.insert('savings', { user_id: saver[0].insertId, balance: 0 });
+                await helper_js_1.default.insert('details', { mail: body.mail });
                 //create user token
                 //return success
-                response_service_js_1.default.respond(res, {}, 200, true, 'Registeration successful');
+                const user = await helper_js_1.default.select('users', [], [{ mail: body.mail }], 'AND');
+                delete user[0].password;
+                delete user[0].salt;
+                const token = jsontoken.sign({ ...user[0] }, config_js_1.config.SECRET, {
+                    expiresIn: 86400 // expires in 24 hours
+                });
+                response_service_js_1.default.respond(res, {}, 200, true, 'Registeration successful', token);
             }
             catch (error) {
                 //console.log(error.code)
@@ -66,7 +72,7 @@ class login extends registerRequest_js_1.default {
                 const body = req.body;
                 await this.loginCheck(req, res);
                 //checker
-                const checker = await helper_js_1.default.select('users', [], [{ email: body.email }], 'AND');
+                const checker = await helper_js_1.default.select('users', [], [{ mail: body.email }], 'AND');
                 if (checker.length == 0)
                     return response_service_js_1.default.respond(res, {}, 404, false, 'Invalid email');
                 //proceed
@@ -80,7 +86,7 @@ class login extends registerRequest_js_1.default {
                 const token = jsontoken.sign({ ...checker[0] }, config_js_1.config.SECRET, {
                     expiresIn: 86400 // expires in 24 hours
                 });
-                response_service_js_1.default.respond(res, { ...checker[0], }, 200, true, 'login successful', token);
+                response_service_js_1.default.respond(res, { ...checker[0] }, 200, true, 'login successful', token);
             }
             catch (error) {
                 console.log(error);

@@ -32,8 +32,6 @@ const config_js_1 = require("../config/config.js");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const fs = __importStar(require("fs"));
 const mime = __importStar(require("mime-db"));
-const canvas = __importStar(require("canvas"));
-const faceapi = __importStar(require("face-api.js"));
 const node_cluster_1 = __importDefault(require("node:cluster"));
 //import '@tensorflow/tfjs-node';
 class action {
@@ -47,27 +45,6 @@ class action {
                     data.push(image);
                 });
                 resolve(data);
-            });
-        };
-        //detect face
-        this.detectFace = async (file) => {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    //turn the base 64 into a fil
-                    const { Canvas, Image, ImageData } = canvas;
-                    faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
-                    const img = new canvas.Image();
-                    img.src = file;
-                    await faceapi.nets.faceLandmark68Net.loadFromDisk('./public/models');
-                    await faceapi.nets.ssdMobilenetv1.loadFromDisk('./public/models');
-                    const detect = await faceapi.detectSingleFace(img);
-                    //console.log(detect)
-                    resolve(detect);
-                }
-                catch (err) {
-                    console.log(err);
-                    reject(err);
-                }
             });
         };
         this.genToken = () => {

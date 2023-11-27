@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const response_service_js_1 = __importDefault(require("../services/response.service.js"));
 const helper_js_1 = __importDefault(require("../database/helper.js"));
 const actionService_js_1 = __importDefault(require("../services/actionService.js"));
+const config_js_1 = require("../config/config.js");
 const userRequests_js_1 = __importDefault(require("../requests/userRequests.js"));
 const authservice_js_1 = __importDefault(require("../services/authservice.js"));
 const websocket_service_js_1 = __importDefault(require("../services/websocket.service.js"));
@@ -59,8 +60,8 @@ class users extends userRequests_js_1.default {
                 const body = req.body;
                 const path = 'src/uploads/';
                 const port = req.hostname;
-                //const url=`${req.protocol}://${req.hostname}:${config.PORT}`;
-                const url = `http://192.168.137.1:1000`;
+                const url = `${req.protocol}://${req.hostname}:${config_js_1.config.PORT}`;
+                // const url=`http://192.168.137.1:1000`;
                 // console.log(body)
                 //work on multiple uploads here
                 if (body.multiple) {
@@ -99,31 +100,6 @@ class users extends userRequests_js_1.default {
                 //get the protocol, host and port
                 // const item=body.file.replace(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/, '');
                 response_service_js_1.default.respond(res, { url: url + '/' + path + process }, 201, true, 'File uploaded');
-            }
-            catch (error) {
-                response_service_js_1.default.respond(res, error.data ? error.data : error, error.code && typeof error.code == 'number' ? error.code : 500, false, error.message ? error.message : 'Server error');
-            }
-        };
-        this.makeUser = async (req, res) => {
-            try {
-                await this.authCheck(req, res);
-                //check if the user exist
-                const body = req.body;
-                const check = await helper_js_1.default.select('apiUsers', ['username'], [{ username: body.username }]);
-                if (check.length != 0) {
-                    //user exists already
-                    response_service_js_1.default.respond(res, {}, 412, false, 'User already exists');
-                    return;
-                }
-                //create the user
-                const token = actionService_js_1.default.genToken();
-                const response = {
-                    token: token,
-                    username: body.username
-                };
-                //save to db
-                await helper_js_1.default.insert('apiUsers', response);
-                response_service_js_1.default.respond(res, response, 201, true, 'User created');
             }
             catch (error) {
                 response_service_js_1.default.respond(res, error.data ? error.data : error, error.code && typeof error.code == 'number' ? error.code : 500, false, error.message ? error.message : 'Server error');

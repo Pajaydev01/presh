@@ -10,11 +10,12 @@ class registerRequest extends main_1.default {
         this.registerCheck = (req, res) => {
             return new Promise((resolve, reject) => {
                 const required = [
-                    'firstname',
-                    'password',
-                    'lastname',
-                    'email',
-                    'phone'
+                    'name',
+                    'mail',
+                    'username',
+                    'country',
+                    'currency',
+                    'password'
                 ];
                 const check = this.run(req, required);
                 let res;
